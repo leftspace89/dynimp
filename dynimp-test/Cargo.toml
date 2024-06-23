@@ -1,0 +1,9 @@
+[package]
+name = "dynimp-test"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+
+[dependencies]
+dynimp-macros = { version = "0.1.0", path = "../dynimp-macros" }
+razy-importer = "0.3.4"
