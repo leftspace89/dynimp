@@ -69,19 +69,24 @@ pub fn dy_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
                     #randomu32,
                 );
 
-                let mut encrypted_address = #cache_ident.lock().unwrap();
-
-                if *encrypted_address == 0
+                
+                let mut decrypted_address = 0;
+                //temp scope
                 {
-                    let imp_address = razy_importer::get_export_forwarded(hash);
-                    if imp_address == 0
-                    {
-                        panic!("imp_address == 0");
-                    }
-                    *encrypted_address =  !(imp_address ^ #enc_key).rotate_left(#roll_random);
-                }
+                    let mut encrypted_address = #cache_ident.lock().unwrap();
 
-                let decrypted_address =   ((!*encrypted_address).rotate_right(#roll_random) ^ #enc_key);
+                    if *encrypted_address == 0
+                    {
+                        let imp_address = razy_importer::get_export_forwarded(hash);
+                        if imp_address == 0
+                        {
+                            panic!("imp_address == 0");
+                        }
+                        *encrypted_address =  !(imp_address ^ #enc_key).rotate_left(#roll_random);
+                    }
+
+                    decrypted_address =  ((!*encrypted_address).rotate_right(#roll_random) ^ #enc_key);
+                }
 
                 std::mem::transmute::<_,unsafe extern "system" fn(#fn_inputs) #fn_return_type>(decrypted_address)(#(#input_names),*)
             }

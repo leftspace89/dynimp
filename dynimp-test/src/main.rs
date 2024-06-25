@@ -11,11 +11,30 @@ pub fn load_library_a(name: *const u8) -> u64 {}
 #[dy_fn]
 pub fn MessageBoxA(fh: u32, text: *const u8, capt: *const u8, btn: u32) -> u64 {}
 
+#[dy_fn]
+pub fn Sleep(dwms: u32) {}
+
+fn thread_test() {
+    unsafe {
+        loop {
+            println!(
+                "rtl_get_current_processor_number : {:#?}",
+                rtl_get_current_processor_number()
+            );
+            Sleep(1001);
+        }
+    }
+}
+
 fn main() {
     unsafe {
         load_library_a("user32.dll\0".as_ptr());
 
         MessageBoxA(0, "Hello,World\0".as_ptr(), "XXX\0".as_ptr(), 0);
+
+        for _i in 0..10 {
+            std::thread::spawn(thread_test);
+        }
 
         loop {
             println!(
